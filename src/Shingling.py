@@ -1,5 +1,6 @@
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
+from pyspark.sql import Row
 from pyspark.ml.feature import NGram
 sc = SparkContext('local')
 spark = SparkSession(sc)
@@ -19,14 +20,13 @@ class Shingling:
                 #print("Read a character:", c)
 
 
-cl = Shingling("Datas/accuracy_garmin_nuvi_255W_gps.txt.data",4)
-wordDataFrame = spark.createDataFrame([
-    (0, ["Hi", "I", "heard", "about", "Spark"]),
-    (1, ["I", "wish", "Java", "could", "use", "case", "classes"]),
-    (2, ["Logistic", "regression", "models", "are", "neat"])
-], ["id", "words"])
+#cl = Shingling("Datas/accuracy_garmin_nuvi_255W_gps.txt.data",4)
 
-ngram = NGram(n=2, inputCol="words", outputCol="ngrams")
+f = sc.textFile("Datas/accuracy_garmin_nuvi_255W_gps.txt.data")
+words = f.map(lambda l : l.split(' '))
+wordDataFrame = words.toDF
+
+ngram = NGram(n=2, inputCol="inputToken", outputCol="ngrams")
 
 ngramDataFrame = ngram.transform(wordDataFrame)
 ngramDataFrame.select("ngrams").show(truncate=False)
