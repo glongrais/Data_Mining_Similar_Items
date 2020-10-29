@@ -22,13 +22,34 @@ class Shingling:
 
 #cl = Shingling("Datas/accuracy_garmin_nuvi_255W_gps.txt.data",4)
 
-f = sc.textFile("Datas/accuracy_garmin_nuvi_255W_gps.txt.data")
-words = f.map(lambda l : l.split(' '))
-wordDataFrame = words.toDF
 
-ngram = NGram(n=2, inputCol="inputToken", outputCol="ngrams")
+# Python3 program to Split string into characters 
+def split(word): 
+    return [char for char in word]  
+      
+# Driver code 
+#word = 'geeks fh kd'
+#print(split(word)) 
 
-ngramDataFrame = ngram.transform(wordDataFrame)
+
+f = open("Datas/accuracy_garmin_nuvi_255W_gps.txt.data")
+
+letter = split(f)
+result =[]
+for l in letter :
+    result = result + split(l)
+#print(result)
+
+df = spark.createDataFrame([Row(inputTokens=result)])
+ngram = NGram(n=12)
+ngram.setInputCol("inputTokens")
+ngram.setOutputCol("nGrams")
+
+
+
+#ngram = NGram(n=2, inputCol="inputToken", outputCol="ngrams")
+
+ngramDataFrame = ngram.transform(df)
 ngramDataFrame.select("ngrams").show(truncate=False)
 #f = open("../Datas/accuracy_garmin_nuvi_255W_gps.txt", "r")
 #print(f.read()) 
