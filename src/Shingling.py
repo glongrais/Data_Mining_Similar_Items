@@ -1,5 +1,8 @@
-import pyspark as spark
+from pyspark.context import SparkContext
+from pyspark.sql.session import SparkSession
 from pyspark.ml.feature import NGram
+sc = SparkContext('local')
+spark = SparkSession(sc)
 
 class Shingling:
 
@@ -14,8 +17,6 @@ class Shingling:
                     #print("End of file")
                     break
                 #print("Read a character:", c)
-
-
 
 
 cl = Shingling("Datas/accuracy_garmin_nuvi_255W_gps.txt.data",4)
