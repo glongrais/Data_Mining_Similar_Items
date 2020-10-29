@@ -26,10 +26,6 @@ class Shingling:
 # Python3 program to Split string into characters 
 def split(word): 
     return [char for char in word]  
-      
-# Driver code 
-#word = 'geeks fh kd'
-#print(split(word)) 
 
 
 f = open("Datas/accuracy_garmin_nuvi_255W_gps.txt.data")
@@ -40,8 +36,9 @@ for l in letter :
     result = result + split(l)
 #print(result)
 
+
 df = spark.createDataFrame([Row(inputTokens=result)])
-ngram = NGram(n=12)
+ngram = NGram(n=2)
 ngram.setInputCol("inputTokens")
 ngram.setOutputCol("nGrams")
 
@@ -50,6 +47,6 @@ ngram.setOutputCol("nGrams")
 #ngram = NGram(n=2, inputCol="inputToken", outputCol="ngrams")
 
 ngramDataFrame = ngram.transform(df)
-ngramDataFrame.select("ngrams").show(truncate=False)
+ngramDataFrame.select("ngrams").show(truncate=100)
 #f = open("../Datas/accuracy_garmin_nuvi_255W_gps.txt", "r")
 #print(f.read()) 
