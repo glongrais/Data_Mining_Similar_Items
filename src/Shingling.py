@@ -1,8 +1,7 @@
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from pyspark.sql import Row
-from pyspark.ml.feature import NGram
-from pyspark.ml.feature import HashingTF
+from pyspark.ml.feature import NGram, HashingTF, IDF, Tokenizer
 sc = SparkContext('local')
 spark = SparkSession(sc)
 
@@ -28,35 +27,45 @@ def split(word):
     return [char for char in word]  
 
 #Open text file
-f = open("Datas/accuracy_garmin_nuvi_255W_gps.txt.data")
+#f = open("Datas/accuracy_garmin_nuvi_255W_gps.txt.data")
+f = open("Datas/test.data")
+data = f.read()
 
 #Split the text into char array
-letter = split(f)
-result =[]
-for l in letter :
-    result = result + split(l)
+#letter = split(f)
+#result =[]
+#for l in letter :
+#    result = result + split(l)
 #print(result)
 
 #Datafram creation
-df = spark.createDataFrame([Row(inputTokens=result)])
-
+df = spark.createDataFrame([Row(inputTokens=data)])
+tokenizer = Tokenizer(inputCol="inputTokens", outputCol="words")
+tokenized = tokenizer.transform(df)
+tokenized.select("inputTokens", "words").show(truncate=100)
 #ngram creation
 #ngram = NGram(n=8)
 #ngram.setInputCol("inputTokens")
 #ngram.setOutputCol("nGrams")
-ngram = NGram(n=8, inputCol="inputTokens", outputCol="ngrams")
-ngramDataFrame = ngram.transform(df)
+ngram = NGram(n=2, inputCol="words", outputCol="ngrams")
+ngramDataFrame = ngram.transform(tokenized)
 #ngramDataFrame.select("ngrams").show(truncate=100)
 
 
 ##TRY TO HASH (Pas foufou pour le moment)
-hashingTF = HashingTF(inputCol="ngrams", outputCol="features")
-hashingTF.setNumFeatures(10)
+hashingTF = HashingTF(inputCol="ngrams", outputCol="rawFeatures")
+hashingTF.setNumFeatures(150)
 
-hashingTF.transform(ngramDataFrame).head().features
+featurizedData =  hashingTF.transform(ngramDataFrame)
 #SparseVector(10, {5: 1.0, 7: 1.0, 8: 1.0})
 
-hashingTF.setParams(outputCol="freqs").transform(ngramDataFrame).head().freqs
+idf = IDF(inputCol="rawFeatures", outputCol="features")
+idfModel = idf.fit(featurizedData)
+rescaledData = idfModel.transform(featurizedData)
+
+rescaledData.select("ngrams", "features").show(truncate=100)
+
+#hashingTF.setParams(outputCol="freqs").transform(ngramDataFrame).head().freqs
 #SparseVector(10, {5: 1.0, 7: 1.0, 8: 1.0})
 
 #params = {hashingTF.numFeatures: 5, hashingTF.outputCol: "vector"}
