@@ -65,6 +65,9 @@ rescaledData = idfModel.transform(featurizedData)
 
 rescaledData.select("ngrams", "features").show(truncate=100)
 
+for row in rescaledData.select("features").collect():
+    print(row[0].toArray())
+
 #hashingTF.setParams(outputCol="freqs").transform(ngramDataFrame).head().freqs
 #SparseVector(10, {5: 1.0, 7: 1.0, 8: 1.0})
 
