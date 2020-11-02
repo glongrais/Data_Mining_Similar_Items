@@ -1,4 +1,6 @@
 from Shingling import Shingling
+from CompareSets import CompareSets
+
 
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
@@ -8,4 +10,6 @@ sc = SparkContext('local[*]')
 spark = SparkSession(sc)
 
 shin = Shingling("Datas",10,spark)
-shin.getNGram().select("id", "features").show(truncate=100)
+df = shin.getNGram()
+
+comp = CompareSets(df, spark)
