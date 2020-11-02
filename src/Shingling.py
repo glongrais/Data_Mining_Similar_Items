@@ -52,8 +52,7 @@ class Shingling:
                     df = df.union(self.spark.createDataFrame([(index, data)], schema))
                 index += 1
         return df
-
-#cl = Shingling("Datas/accuracy_garmin_nuvi_255W_gps.txt.data",4)
+        #cl = Shingling("Datas/accuracy_garmin_nuvi_255W_gps.txt.data",4)
 
 """
 # Python3 program to Split string into characters 
