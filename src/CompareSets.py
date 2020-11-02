@@ -4,7 +4,7 @@ from os.path import isdir, join
 from pyspark.sql.types import StructField, StructType, StringType, IntegerType, FloatType
 from pyspark.ml.feature import NGram, HashingTF, IDF, Tokenizer
 from pyspark.ml import Pipeline
-import pyspark.sql.functions as F
+from pyspark.sql.functions import col
 from pyspark.sql import Column
 
 
@@ -26,20 +26,21 @@ class CompareSets:
         s1 = set()
         s2 = set()
         first = True
+        #print(self.df['id'])
         for t in self.df.select("id","features").collect():
             tmpT = set(t.features.indices)
-            schema = StructType([StructField(str(t.id), FloatType(), True)])
+            schema = StructType([StructField("id", IntegerType(), True), StructField(str(t.id), FloatType(), True)])
             tmpDf = self.spark.createDataFrame([],schema)
-            l = []
+        
             for u in self.df.select("id","features").collect():
                 tmpU = set(u.features.indices)
                 s1 = tmpT.union(tmpU)
                 s2 = tmpT.intersection(tmpU)
-                tmpDf = tmpDf.union(self.spark.createDataFrame([(len(s2)/len(s1))],[str(t.id)]))
+                tmpDf = tmpDf.union(self.spark.createDataFrame([(u.id, len(s2)/len(s1))],[str(t.id)]))
                 #l += [len(s2)/len(s1)]
                 #([(t.id, len(s2)/len(s1))], ["id", str(u.id) ])
-            self.df.withColumn(t.id,tmpDf(str(t.id)))
-        self.df.show(truncate=100)
+            self.df = self.df.join(tmpDf, on=["id"])
+        self.df.show(truncate=10)
 
     
 
