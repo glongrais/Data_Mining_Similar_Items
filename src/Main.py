@@ -9,7 +9,7 @@ from pyspark.ml.feature import NGram, HashingTF, IDF, Tokenizer
 sc = SparkContext('local[*]')
 spark = SparkSession(sc)
 
-shin = Shingling("Datas",10,spark)
+shin = Shingling("Datas2",2,spark)
 df = shin.getNGram()
 
 comp = CompareSets(df, spark)
