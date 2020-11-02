@@ -36,7 +36,11 @@ class CompareSets:
                 tmpU = set(u.features.indices)
                 s1 = tmpT.union(tmpU)
                 s2 = tmpT.intersection(tmpU)
-                tmpDf = tmpDf.union(self.spark.createDataFrame([(u.id, len(s2)/len(s1))],[str(t.id)]))
+                try:
+                    tmpDf = tmpDf.union(self.spark.createDataFrame([(u.id, len(s2)/len(s1))],[str(t.id)]))
+                except ZeroDivisionError:
+                    tmpDf = tmpDf.union(self.spark.createDataFrame([(u.id, len(s2))],[str(t.id)]))
+                
                 #l += [len(s2)/len(s1)]
                 #([(t.id, len(s2)/len(s1))], ["id", str(u.id) ])
             self.df = self.df.join(tmpDf, on=["id"])
