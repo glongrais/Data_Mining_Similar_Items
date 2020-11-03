@@ -4,6 +4,7 @@ from os.path import isdir, join
 from pyspark.sql.types import StructField, StructType, StringType, IntegerType, FloatType
 from pyspark.ml.feature import NGram, HashingTF, IDF, Tokenizer
 from pyspark.ml import Pipeline
+from pyspark.ml.linalg import SparseVector, VectorUDT
 from pyspark.sql.functions import col
 from pyspark.sql import Column
 
@@ -16,35 +17,35 @@ class CompareSets:
         self.jaccard()
 
     def jaccard(self):
-        #def jaccard(list1, list2):
-        #self.df.filter(self.df.id == 1).show(truncate=100) 
-        #self.df.filter(self.df.id == 0).show(truncate=100)  #len(list(set(list1).intersection(list2)))
-        #union = (len(list1) + len(list2)) - intersection
-        #return float(intersection) / union
-
 
         s1 = set()
         s2 = set()
-        first = True
-        #print(self.df['id'])
-        for t in self.df.select("id","features").collect():
+
+        datas = self.df.select("id","features").collect()
+
+        schema = StructType([StructField("id", IntegerType(), True), StructField("jaccardSimilarity", VectorUDT(), True)])
+        tmpDf = self.spark.createDataFrame([],schema)
+       
+        for t in datas:
+
+            vect = {}
             tmpT = set(t.features.indices)
-            schema = StructType([StructField("id", IntegerType(), True), StructField(str(t.id), FloatType(), True)])
-            tmpDf = self.spark.createDataFrame([],schema)
         
-            for u in self.df.select("id","features").collect():
+            for u in datas:
                 tmpU = set(u.features.indices)
                 s1 = tmpT.union(tmpU)
                 s2 = tmpT.intersection(tmpU)
                 try:
-                    tmpDf = tmpDf.union(self.spark.createDataFrame([(u.id, len(s2)/len(s1))],[str(t.id)]))
+                    vect[u.id] = len(s2)/len(s1)
                 except ZeroDivisionError:
-                    tmpDf = tmpDf.union(self.spark.createDataFrame([(u.id, len(s2))],[str(t.id)]))
-                
-                #l += [len(s2)/len(s1)]
-                #([(t.id, len(s2)/len(s1))], ["id", str(u.id) ])
-            self.df = self.df.join(tmpDf, on=["id"])
-        self.df.show(truncate=10)
+                    vect[u.id] = 0
+
+            sparceVect = SparseVector(len(vect), vect)
+            tmpDf = tmpDf.union(self.spark.createDataFrame([(t.id, sparceVect)], schema))
+          
+        self.df = self.df.join(tmpDf, on=["id"])
+
+        self.df.select("id", "jaccardSimilarity").show(truncate=200)
 
     
 
