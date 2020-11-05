@@ -18,7 +18,7 @@ class Shingling:
 
         tokenizer = Tokenizer(inputCol="inputTokens", outputCol="words")
         ngram = NGram(n=self.k, inputCol="words", outputCol="ngrams")
-        hashingTF = HashingTF(inputCol="ngrams", outputCol="rawFeatures")
+        hashingTF = HashingTF(inputCol="ngrams", outputCol="rawFeatures", numFeatures=10000)
         idf = IDF(inputCol="rawFeatures", outputCol="features")
 
         model = Pipeline(stages=[tokenizer, ngram, hashingTF, idf]).fit(df)
