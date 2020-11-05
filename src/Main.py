@@ -10,7 +10,7 @@ from pyspark.ml.feature import NGram, HashingTF, IDF, Tokenizer
 sc = SparkContext('local[*]')
 spark = SparkSession(sc)
 
-shin = Shingling("Datas2",2,spark)
+shin = Shingling("Datas2",8,spark)
 df = shin.getNGram()#.select("id","features").show(truncate=100)
 
 #print(df.collect()[0]["rawFeatures"])
