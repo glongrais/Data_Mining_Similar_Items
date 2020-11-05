@@ -45,15 +45,25 @@ class MinHashing:
             for j in range(len(matrix.columns)-1):
                 tmp.append(c+1)
             signature.append(tmp)
-            
-
+        
+        print(signature)
+        first = True
+        a = []
+        b = []
         for i in range(c):
             tmpHash = []
             for j in range(k):
-                a = random.randint(1, pow(2, 15))
-                b = random.randint(1, pow(2, 15))
+                if first:
+                    a.append(random.randint(1, pow(2, 15)))
+                    b.append(random.randint(1, pow(2, 15)))
+                    
 
-                tmpHash.append((a*i+b)%c)
+                tmpHash.append((a[j]*i+b[j])%c)
+            
+            if first:
+                matrix.show()
+                print(tmpHash)
+                first = False
 
             for j in range(1, len(matrix.columns)):
                 if matrix.collect()[i][j]:
