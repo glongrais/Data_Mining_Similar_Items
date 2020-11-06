@@ -16,7 +16,7 @@ class MinHashing:
         self.df = df
         self.sc = sc
         matrix = self.booleanMatrix()
-        self.minHash(matrix, 3)
+        self.minHash(matrix, 5)
     
 
 
@@ -50,12 +50,14 @@ class MinHashing:
         first = True
         a = []
         b = []
+
+        m = matrix.collect()
         for i in range(c):
             tmpHash = []
             for j in range(k):
                 if first:
-                    a.append(random.randint(1, pow(2, 15)))
-                    b.append(random.randint(1, pow(2, 15)))
+                    a.append(random.randint(1, pow(2, 32)))
+                    b.append(random.randint(1, pow(2, 32)))
                     
 
                 tmpHash.append((a[j]*i+b[j])%c)
@@ -63,16 +65,17 @@ class MinHashing:
             if first:
                 first = False
                 matrix.show()
-            print(tmpHash)
+            #print(tmpHash)
 
             for j in range(1, len(matrix.columns)):
-                if matrix.collect()[i][j] == "true":
+                if m[i][j] == "true":
                     for l in range(k):
                         if tmpHash[l] < signature[l][j-1]:
                             signature[l][j-1] = tmpHash[l]
 
-        print(signature)
-        print()            
+        for r in signature:
+            print(r)
+                   
 
 
 
