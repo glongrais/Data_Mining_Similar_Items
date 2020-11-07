@@ -34,7 +34,7 @@ class Shingling:
         index = 0
         first = True
 
-        schema = StructType([StructField("id", IntegerType(), True), StructField("inputTokens", StringType(), True)])
+        schema = StructType([StructField("id", IntegerType(), True),StructField("docName", StringType(), True), StructField("inputTokens", StringType(), True)])
 
         df = self.spark.createDataFrame([], schema)
 
@@ -46,10 +46,10 @@ class Shingling:
                 dataFile = open(fullPath, encoding="ISO-8859-1")
                 data = dataFile.read()
                 if first:
-                    df = self.spark.createDataFrame([(index, data)], schema)
+                    df = self.spark.createDataFrame([(index, f, data)], schema)
                     first = False
                 else:
-                    df = df.union(self.spark.createDataFrame([(index, data)], schema))
+                    df = df.union(self.spark.createDataFrame([(index, f, data)], schema))
                 index += 1
         return df
         

@@ -15,8 +15,6 @@ class MinHashing:
         self.spark = spark
         self.df = df
         self.sc = sc
-        matrix = self.booleanMatrix()
-        self.minHash(matrix, 5)
     
 
 
@@ -34,7 +32,7 @@ class MinHashing:
         for i in range(Rows):
             listsh = set(datas[i]["features"].indices) 
             listcontains = F.udf(lambda value: value in listsh) 
-            matrix = matrix.withColumn("doc "+str(i), listcontains(F.col("value")))
+            matrix = matrix.withColumn(datas[i]["docName"], listcontains(F.col("value")))
         
         return matrix
     
@@ -47,7 +45,7 @@ class MinHashing:
                 tmp.append(c+1)
             signature.append(tmp)
         
-        print(signature)
+        #print(signature)
         first = True
         a = []
         b = []
@@ -74,8 +72,11 @@ class MinHashing:
                         if tmpHash[l] < signature[l][j-1]:
                             signature[l][j-1] = tmpHash[l]
 
+        print()
         for r in signature:
             print(r)
+        
+        return signature
                    
 
 
