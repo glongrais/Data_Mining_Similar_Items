@@ -35,7 +35,7 @@ class MinHashing:
         for i in range(Rows):
             listsh = set(datas[i]["features"].indices) #Get the set of ngram for the current row
             listcontains = F.udf(lambda value: value in listsh) #contains function
-            matrix = matrix.withColumn(datas[i]["docName"], listcontains(F.col("value")))#Set true if the doc contains the shingle
+            matrix = matrix.withColumn(str(datas[i]["id"]), listcontains(F.col("value")))#Set true if the doc contains the shingle
 
         return matrix
 
@@ -75,6 +75,7 @@ class MinHashing:
                     for l in range(k):
                         if tmpHash[l] < signature[l][j-1]:
                             signature[l][j-1] = tmpHash[l]
+        
         
         signature = self.spark.createDataFrame(signature, matrix.columns[1:]) #Datafram containing the signature function
         return signature

@@ -2,17 +2,18 @@ from pyspark.sql.types import StructField, StructType, StringType, IntegerType, 
 import pyspark.sql.functions as F
 from pyspark.sql.window import Window
 
+from pyspark.sql import Column
+
 
 class CompareSignatures:
    
-    def __init__(self, sigMatrix, spark, sc):
-        self.sigMatrix = sigMatrix
+    def __init__(self, spark, sc):
         self.spark = spark
         self.sc = sc
         
 #Create the matrix showing the similarity between documents using the signature matrix
-    def compare(self):
-        datas = self.sigMatrix.collect()
+    def compare(self, sigMatrix):
+        datas = sigMatrix.collect()
         rows = len(datas)
         cols = len(datas[0])
         simMatrix = []
@@ -34,13 +35,16 @@ class CompareSignatures:
         simMatrix = [[(j/rows) for j in i] for i in simMatrix]#Final computation for similarity matrix using signatures
         
 
-        CompareSign = self.spark.createDataFrame(simMatrix, self.sigMatrix.columns)
+        CompareSign = self.spark.createDataFrame(simMatrix, sigMatrix.columns)
         #Retreive files names as dataframe
-        names = self.spark.createDataFrame(self.sc.parallelize(self.sigMatrix.columns), StringType(), "names")
+        #names = self.spark.createDataFrame(self.sc.parallelize(sigMatrix.columns), StringType(), "names")
         #Put names as a new row in both dataframe and join them
-        names=names.withColumn('row_index', F.row_number().over(Window.orderBy(F.monotonically_increasing_id())))
-        CompareSign=CompareSign.withColumn('row_index', F.row_number().over(Window.orderBy(F.monotonically_increasing_id())))
-        CompareSign = CompareSign.join(names, on=["row_index"]).drop("row_index")
+        #names=names.withColumn('row_index', F.row_number().over(Window.orderBy(F.monotonically_increasing_id())))
+        #CompareSign=CompareSign.withColumn('row_index', F.row_number().over(Window.orderBy(F.monotonically_increasing_id())))
+        #l = Column(range(sigMatrix.columns))
+        #names=names.withColumn('row_index', l)
+        #CompareSign=CompareSign.withColumn('names', names.value)
+        #CompareSign = CompareSign.join(names, on=["row_index"]).drop("row_index")
         
-        CompareSign.show(truncate=20)
+        #CompareSign.show(truncate=20)
         return CompareSign
