@@ -15,27 +15,27 @@ class CompareSets:
         self.df = df
         self.jaccard()
 
+#Perform jaccard similarity calculation
     def jaccard(self):
 
         s1 = set()
         s2 = set()
 
-        datas = self.df.select("id","features").collect()
+        datas = self.df.select("id","features").collect()#Collect the ngram for each documents
 
         schema = StructType([StructField("id", IntegerType(), True), StructField("jaccardSimilarity", VectorUDT(), True)])
-        tmpDf = self.spark.createDataFrame([],schema)
+        tmpDf = self.spark.createDataFrame([],schema)#Create new dataframe for the jaccardSimilarity
 
+        #Loop for jaccard similarity
         for t in datas:
-
             vect = {}
             tmpT = set(t.features.indices)
-
             for u in datas:
                 tmpU = set(u.features.indices)
                 s1 = tmpT.union(tmpU)
                 s2 = tmpT.intersection(tmpU)
                 try:
-                    vect[u.id] = len(s2)/len(s1)
+                    vect[u.id] = len(s2)/len(s1) #Jaccard similarity calculation
                 except ZeroDivisionError:
                     vect[u.id] = 0
 
