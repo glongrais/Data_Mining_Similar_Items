@@ -46,12 +46,12 @@ class Shingling:
                 
                 fullPath = join(folderPath, f)
                 dataFile = open(fullPath, encoding="ISO-8859-1")
-                data = dataFile.read()
+                data = dataFile.read() #get the datas
                 if first:
                     df = self.spark.createDataFrame([(index, f, data)], schema)
                     first = False
                 else:
-                    df = df.union(self.spark.createDataFrame([(index, f, data)], schema))
-                index += 1
+                    df = df.union(self.spark.createDataFrame([(index, f, data)], schema)) #Create the datagrame with doc and content 
+                    index += 1
         return df
         
