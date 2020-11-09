@@ -12,13 +12,13 @@ class LSH:
         self.sc = sc
 
     # Return the potential similar items
-    def lsh(self, sigMatrix):
+    def lsh(self, sigMatrix, b):
         datas = sigMatrix.collect()
         colNames = sigMatrix.columns
 
         docSimilar = []
 
-        bandSize = 3
+        bandSize = b
 
         for i in range(0, len(datas), bandSize): # Loop throw each bands
             bucket = {} # Create a new bucket for each band

@@ -30,12 +30,13 @@ def compareSignature(k):
             colIndex +=1
         rowIndex +=1 
 
-def Lsh(k):
+def Lsh(k,b):
     min = MinHashing(df, spark, sc)
     boolmatrix = min.booleanMatrix() #Matrix characteristic 
     sigMatrix = min.minHash(boolmatrix, k) # Signature Matrix
     compSign = CompareSignatures( spark, sc) # Compare signature to approximate jaccard similarity with signature matrix
     sign = compSign.compare(sigMatrix)
+    #If we want to compare LSH against minHashing
     # names = sign.columns
     # datas = sign.collect()
     # rowIndex = 0
@@ -48,7 +49,7 @@ def Lsh(k):
     #     rowIndex +=1 
 
     lsh = LSH(spark, sc)
-    docSimilar = lsh.lsh(sigMatrix)
+    docSimilar = lsh.lsh(sigMatrix,b)
 
     print()
 
@@ -76,7 +77,7 @@ if sys.argv[1] == "minHashing": #if we call signature, perform minhashing and co
     compareSignature(int(sys.argv[3]))
 
 if sys.argv[1] == "LSH": 
-    Lsh(int(sys.argv[3]))
+    Lsh(int(sys.argv[3]), int(sys.argv[5]))
 
 
 
