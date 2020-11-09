@@ -29,7 +29,6 @@ class MinHashing:
         Setint = [int(i) for i in SetShingling]
 
         matrix = self.spark.createDataFrame(self.sc.parallelize(Setint), IntegerType(), "value")
-        matrix.show(truncate=100)
         for i in range(Rows):
             listsh = set(datas[i]["features"].indices)
             listcontains = F.udf(lambda value: value in listsh)

@@ -2,7 +2,7 @@ from Shingling import Shingling
 from CompareSets import CompareSets
 from MinHashing import MinHashing
 from CompareSignatures import CompareSignatures
-
+import sys
 import numpy as np
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
@@ -11,14 +11,33 @@ from pyspark.ml.feature import NGram, HashingTF, IDF, Tokenizer
 sc = SparkContext('local[*]')
 spark = SparkSession(sc)
 
-shin = Shingling("Datas",8,spark)
+def compare():
+    CompareSets(df, spark)
+
+def compareSignature(v):
+    min = MinHashing(df, spark, sc)
+    boolMatrix = matrix = min.booleanMatrix()
+    sigMatrix = min.minHash(matrix, v)
+    compSign = CompareSignatures(sigMatrix, spark, sc)
+    sign = compSign.compare()
+    datas = sign.collect()
+    for i in datas:
+        for j in i:
+            if j >= 0.2:
+                #print la row i
+
+shin = Shingling("Datas",int(sys.argv[2]),spark)
 df = shin.getNGram()
 
-#comp = CompareSets(df, spark)
+if sys.argv[1] == "compare":
+    compare()
 
-min = MinHashing(df, spark, sc)
-boolMatrix = matrix = min.booleanMatrix()
-sigMatrix = min.minHash(matrix, 50)
+if sys.argv[1] == "signature":
+    compareSignature(int(sys.argv[3]))
 
-#sigJaccard = CompareSignatures(sigMatrix)
-CompareSignatures(sigMatrix, spark, sc)
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 from pyspark.sql.types import StructField, StructType, StringType, IntegerType, FloatType, ArrayType
 import pyspark.sql.functions as F
-from pyspark.sql.functions import lit
+from pyspark.sql.window import Window
 
 
 class CompareSignatures:
@@ -9,7 +9,7 @@ class CompareSignatures:
         self.sigMatrix = sigMatrix
         self.spark = spark
         self.sc = sc
-        self.compare()
+        
 
     def compare(self):
         datas = self.sigMatrix.collect()
@@ -31,7 +31,14 @@ class CompareSignatures:
         print()
         simMatrix = [[(j/rows) for j in i] for i in simMatrix]
         
+
         CompareSign = self.spark.createDataFrame(simMatrix, self.sigMatrix.columns)
-        #To finish, ADD columns of names
-        #names = self.spark.createDataFrame(self.sc.parallelize(self.sigMatrix.columns), StringType(), "names")
-        CompareSign.show()
+        #Retreive files names
+        names = self.spark.createDataFrame(self.sc.parallelize(self.sigMatrix.columns), StringType(), "names")
+        #Put names as a new row
+        names=names.withColumn('row_index', F.row_number().over(Window.orderBy(F.monotonically_increasing_id())))
+        CompareSign=CompareSign.withColumn('row_index', F.row_number().over(Window.orderBy(F.monotonically_increasing_id())))
+        CompareSign = CompareSign.join(names, on=["row_index"]).drop("row_index")
+        
+        CompareSign.show(truncate=20)
+        return CompareSign

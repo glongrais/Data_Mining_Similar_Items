@@ -45,7 +45,7 @@ class CompareSets:
           
         self.df = self.df.join(tmpDf, on=["id"])
 
-        self.df.select("id", "jaccardSimilarity").show(truncate=200)
+        self.df.select("id", "jaccardSimilarity").show(truncate=20)
 
     
 
