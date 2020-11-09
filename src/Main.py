@@ -23,8 +23,12 @@ def compareSignature(v):
     datas = sign.collect()
     for i in datas:
         for j in i:
-            if j >= 0.2:
-                #print la row i
+            if isinstance(j, float):
+                if j >= 0.2:
+                    print("%s and %s have a %f similarity", "te", "te", j)
+                    
+
+
 
 shin = Shingling("Datas",int(sys.argv[2]),spark)
 df = shin.getNGram()
