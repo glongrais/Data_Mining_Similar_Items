@@ -16,14 +16,15 @@ class Shingling:
 
         df = self.readData(self.folderPath)
 
-        tokenizer = Tokenizer(inputCol="inputTokens", outputCol="words")
-        ngram = NGram(n=self.k, inputCol="words", outputCol="ngrams")
-        hashingTF = HashingTF(inputCol="ngrams", outputCol="rawFeatures", numFeatures=10000)
-        idf = IDF(inputCol="rawFeatures", outputCol="features")
+        #Prepare the stages to build the pipeline
+        tokenizer = Tokenizer(inputCol="inputTokens", outputCol="words")#Tokenize the separate the text in words
+        ngram = NGram(n=self.k, inputCol="words", outputCol="ngrams") #perform NGram and put the results in ngrams column
+        hashingTF = HashingTF(inputCol="ngrams", outputCol="rawFeatures", numFeatures=10000)#apply a hashfunction to the ngrams colums
+        idf = IDF(inputCol="rawFeatures", outputCol="features")#Rescale vector rawFeatures to improve performance
 
-        model = Pipeline(stages=[tokenizer, ngram, hashingTF, idf]).fit(df)
+        model = Pipeline(stages=[tokenizer, ngram, hashingTF, idf]).fit(df)#Build the pipeline
 
-        result = model.transform(df)
+        result = model.transform(df)#run the pipeline
 
         return result
 
@@ -34,11 +35,12 @@ class Shingling:
         index = 0
         first = True
 
+        #Schema creation to collect the docs name and the content
         schema = StructType([StructField("id", IntegerType(), True),StructField("docName", StringType(), True), StructField("inputTokens", StringType(), True)])
 
-        df = self.spark.createDataFrame([], schema)
+        df = self.spark.createDataFrame([], schema)#creation of a dataframe with previous schema
 
-        for f in listdir(folderPath): 
+        for f in listdir(folderPath): #for all file in folder
             
             if not isdir(f): 
                 

@@ -10,7 +10,6 @@ from pyspark.sql import Column
 
 
 class CompareSets:
-   
     def __init__(self, df, spark):
         self.spark = spark
         self.df = df
@@ -25,12 +24,12 @@ class CompareSets:
 
         schema = StructType([StructField("id", IntegerType(), True), StructField("jaccardSimilarity", VectorUDT(), True)])
         tmpDf = self.spark.createDataFrame([],schema)
-       
+
         for t in datas:
 
             vect = {}
             tmpT = set(t.features.indices)
-        
+
             for u in datas:
                 tmpU = set(u.features.indices)
                 s1 = tmpT.union(tmpU)
@@ -42,10 +41,10 @@ class CompareSets:
 
             sparceVect = SparseVector(len(vect), vect)
             tmpDf = tmpDf.union(self.spark.createDataFrame([(t.id, sparceVect)], schema))
-          
+
         self.df = self.df.join(tmpDf, on=["id"])
 
-        self.df.select("id", "jaccardSimilarity").show(truncate=20)
+        self.df.select("id", "jaccardSimilarity").show(truncate=100)
 
     
 

@@ -20,17 +20,22 @@ def compareSignature(v):
     sigMatrix = min.minHash(matrix, v)
     compSign = CompareSignatures(sigMatrix, spark, sc)
     sign = compSign.compare()
+    names = sign.columns
     datas = sign.collect()
+    rowIndex = 0
     for i in datas:
+        colIndex = 0
         for j in i:
             if isinstance(j, float):
-                if j >= 0.2:
-                    print("%s and %s have a %f similarity", "te", "te", j)
+                if j >= float(sys.argv[4]):
+                    print(""+names[colIndex]+" and "+names[rowIndex]+" have a "+str(j)+" similarity")
+            colIndex +=1
+        rowIndex +=1 
                     
 
 
 
-shin = Shingling("Datas",int(sys.argv[2]),spark)
+shin = Shingling("Datas",int(sys.argv[2]),spark) #Call the Shingling class to perform k-gram for the documents in the "Datas" folder
 df = shin.getNGram()
 
 if sys.argv[1] == "compare":
