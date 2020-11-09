@@ -16,9 +16,9 @@ def compare():
 
 def compareSignature(v):
     min = MinHashing(df, spark, sc)
-    boolMatrix = matrix = min.booleanMatrix()
-    sigMatrix = min.minHash(matrix, v)
-    compSign = CompareSignatures(sigMatrix, spark, sc)
+    boolmatrix = min.booleanMatrix() #Matrix characteristic 
+    sigMatrix = min.minHash(boolmatrix, v) # Signature Matrix
+    compSign = CompareSignatures(sigMatrix, spark, sc) # Compare signature to approximate jaccard similarity with signature matrix
     sign = compSign.compare()
     names = sign.columns
     datas = sign.collect()
@@ -35,13 +35,13 @@ def compareSignature(v):
 
 
 
-shin = Shingling("Datas",int(sys.argv[2]),spark) #Call the Shingling class to perform k-gram for the documents in the "Datas" folder
-df = shin.getNGram()
+shin = Shingling("Datas",int(sys.argv[2]),spark) #Create a Shingling object with parameter n for n-gram
+df = shin.getNGram() #Perform Ngram on shingling object
 
-if sys.argv[1] == "compare":
+if sys.argv[1] == "compare": #if we call compare, perform compare function for jaccard similarity 
     compare()
 
-if sys.argv[1] == "signature":
+if sys.argv[1] == "signature": #if we call signature, perform minhashing and compare minhashing
     compareSignature(int(sys.argv[3]))
 
 
