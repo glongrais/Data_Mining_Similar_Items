@@ -2,6 +2,7 @@ from Shingling import Shingling
 from CompareSets import CompareSets
 from MinHashing import MinHashing
 from CompareSignatures import CompareSignatures
+from LSH import LSH
 import sys
 import numpy as np
 from pyspark.context import SparkContext
@@ -31,6 +32,9 @@ def compareSignature(v):
                     print(""+names[colIndex]+" and "+names[rowIndex]+" have a "+str(j)+" similarity")
             colIndex +=1
         rowIndex +=1 
+
+    lsh = LSH(spark, sc)
+    lsh.lsh(sigMatrix)
                     
 
 
@@ -43,8 +47,6 @@ if sys.argv[1] == "compare": #if we call compare, perform compare function for j
 
 if sys.argv[1] == "signature": #if we call signature, perform minhashing and compare minhashing
     compareSignature(int(sys.argv[3]))
-
-
 
 
 
