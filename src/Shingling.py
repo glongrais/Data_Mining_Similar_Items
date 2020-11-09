@@ -42,8 +42,7 @@ class Shingling:
 
         for f in listdir(folderPath): #for all file in folder
             
-            if not isdir(f): 
-                
+            if not isdir(f):
                 fullPath = join(folderPath, f)
                 dataFile = open(fullPath, encoding="ISO-8859-1")
                 data = dataFile.read() #get the datas
@@ -52,6 +51,6 @@ class Shingling:
                     first = False
                 else:
                     df = df.union(self.spark.createDataFrame([(index, f, data)], schema)) #Create the datagrame with doc and content 
-                    index += 1
+                index += 1
         return df
         

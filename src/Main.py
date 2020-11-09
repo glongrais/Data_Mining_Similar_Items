@@ -26,16 +26,17 @@ def compareSignature(k):
         for j in i:
             if isinstance(j, float):
                 if j >= float(sys.argv[4]):
-                    print(""+names[colIndex]+" and "+names[rowIndex]+" have a "+str(j)+" similarity")
+                    print(""+df.filter("id = "+names[colIndex]).collect()[0].docName+" and "+df.filter("id = "+names[rowIndex]).collect()[0].docName+" have a "+str(j)+" similarity")
             colIndex +=1
         rowIndex +=1 
 
 def Lsh(k,b):
-    min = MinHashing(df, spark, sc)
-    boolmatrix = min.booleanMatrix() #Matrix characteristic 
-    sigMatrix = min.minHash(boolmatrix, k) # Signature Matrix
+    minHash = MinHashing(df, spark, sc)
+    boolmatrix = minHash.booleanMatrix() #Matrix characteristic 
+    sigMatrix = minHash.minHash(boolmatrix, k) # Signature Matrix
     compSign = CompareSignatures( spark, sc) # Compare signature to approximate jaccard similarity with signature matrix
     sign = compSign.compare(sigMatrix)
+
     #If we want to compare LSH against minHashing
     # names = sign.columns
     # datas = sign.collect()
@@ -54,12 +55,13 @@ def Lsh(k,b):
     print()
 
     # Compare signature vector of all potential similar items
+    
     for docs in docSimilar:
         sign = compSign.compare(sigMatrix.select(docs[0], docs[1]))
         datas = sign.collect()
         names = sign.columns
         if datas[0][1] >= float(sys.argv[4]):
-            print(""+names[0]+" and "+names[1]+" have a "+str(datas[0][1])+" similarity")
+            print(""+df.filter("id = "+names[0]).collect()[0].docName+" and "+df.filter("id = "+names[1]).collect()[0].docName+" have a "+str(datas[0][1])+" similarity")
 
 
 
